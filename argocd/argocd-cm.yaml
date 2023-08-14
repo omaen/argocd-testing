@@ -11,16 +11,9 @@ data:
     discovery.lua: |
       actions = {}
       actions["Stop"] = {["disabled"] = false}
-      actions["Start"] = {["disabled"] = false}
 
-      local stop = false
       if obj.spec.replicas == 0 then
-        stop = true
-      end
-      if stop then
         actions["Stop"]["disabled"] = true
-      else
-        actions["Start"]["disabled"] = true
       end
 
       return actions
@@ -28,8 +21,9 @@ data:
     - name: Stop
       action.lua: |
         obj.spec.replicas = 0
-        return obj
-    - name: Start
-      action.lua: |
-        obj.spec.replicas = nil
+        if obj.metadata.annotations ~= nil then
+          obj.metadata.annotations = {["skip.kartverket.no/k8sReplicaLimits"] = "ignore"}
+        else
+          obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
+        end
         return obj
