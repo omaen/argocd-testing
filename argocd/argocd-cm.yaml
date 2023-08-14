@@ -21,7 +21,7 @@ data:
     - name: Stop
       action.lua: |
         obj.spec.replicas = 0
-        if obj.metadata.annotations ~= nil then
+        if obj.metadata.annotations == nil then
           obj.metadata.annotations = {["skip.kartverket.no/k8sReplicaLimits"] = "ignore"}
         else
           obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
