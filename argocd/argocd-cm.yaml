@@ -10,7 +10,10 @@ data:
   resource.customizations.actions.skiperator.kartverket.no_Application: |
     discovery.lua: |
       actions = {}
-      actions["Stop"] = {["disabled"] = false}
+      actions["Stop"] = {
+        ["disabled"] = false,
+        ["iconClass"] = "fa fa-fw fa-pause"
+      }
 
       if obj.spec.replicas == 0 then
         actions["Stop"]["disabled"] = true
