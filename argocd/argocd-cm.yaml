@@ -27,11 +27,9 @@ data:
     definitions:
     - name: Stop
       action.lua: |
-        obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
         obj.spec.replicas = 0
         return obj
     - name: Start
       action.lua: |
-        obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
         obj.spec.replicas = nil
         return obj
