@@ -25,12 +25,12 @@ data:
 
       return actions
     definitions:
-    - name: scale_down
+    - name: Stop
       action.lua: |
         obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
         obj.spec.replicas = 0
         return obj
-    - name: scale_up
+    - name: Start
       action.lua: |
         obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
         obj.spec.replicas = nil
