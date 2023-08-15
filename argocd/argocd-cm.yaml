@@ -7,7 +7,6 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
-  resource.customizations.useOpenLibs.skiperator.kartverket.no_Application: "true"
   resource.customizations.actions.skiperator.kartverket.no_Application: |
     discovery.lua: |
       actions = {}
@@ -30,28 +29,15 @@ data:
     definitions:
     - name: Suspend
       action.lua: |
-        local json = require("json")
-        local last_replicas = json.encode(obj.spec.replicas)
         obj.spec.replicas = 0
         if obj.metadata.annotations == nil then
-          obj.metadata.annotations = {
-            ["skip.kartverket.no/k8sReplicaLimits"] = "ignore",
-            ["skip.kartverket.no/lastReplicas"] = last_replicas
-          }
+          obj.metadata.annotations = {["skip.kartverket.no/k8sReplicaLimits"] = "ignore"}
         else
           obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
-          obj.metadata.annotations["skip.kartverket.no/lastReplicas"] = last_replicas
         end
         return obj
     - name: Resume
       action.lua: |
-        local json = require("json")
-        local last_replicas = obj.spec.annotations["skip.kartverket.no/lastReplicas"]
         obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
-
-        if last_replicas ~= nil
-          obj.spec.replicas = json.decode(last_replicas)
-        else
-          obj.spec.replicas = nil
-        end
+        obj.spec.replicas = nil
         return obj
