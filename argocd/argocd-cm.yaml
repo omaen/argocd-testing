@@ -34,7 +34,7 @@ data:
         obj.spec.replicas = 0
         if obj.metadata.annotations == nil then
           obj.metadata.annotations = {
-            ["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
+            ["skip.kartverket.no/k8sReplicaLimits"] = "ignore",
             ["skip.kartverket.no/lastReplicas"] = last_replicas
           }
         else
