@@ -29,7 +29,8 @@ data:
     definitions:
     - name: Suspend
       action.lua: |
-        local last_replicas = obj.spec.replicas
+        local json = require("json")
+        local last_replicas = json.encode(obj.spec.replicas)
         obj.spec.replicas = 0
         if obj.metadata.annotations == nil then
           obj.metadata.annotations = {
@@ -43,12 +44,13 @@ data:
         return obj
     - name: Resume
       action.lua: |
+        local json = require("json")
         local last_replicas = obj.spec.annotations["skip.kartverket.no/lastReplicas"]
+        obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
+
         if last_replicas ~= nil
-          obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
-          obj.spec.replicas = last_replicas
+          obj.spec.replicas = json.decode(last_replicas)
         else
-          obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
           obj.spec.replicas = nil
         end
         return obj
