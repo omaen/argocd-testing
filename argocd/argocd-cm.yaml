@@ -10,23 +10,45 @@ data:
   resource.customizations.actions.skiperator.kartverket.no_Application: |
     discovery.lua: |
       actions = {}
-      actions["Stop"] = {
+      actions["Suspend"] = {
         ["disabled"] = false,
         ["iconClass"] = "fa fa-fw fa-pause"
       }
+      actions["Resume"] = {
+        ["disabled"] = false,
+        ["iconClass"] = "fa fa-fw fa-play"
+      }
 
       if obj.spec.replicas == 0 then
-        actions["Stop"]["disabled"] = true
+        actions["Suspend"]["disabled"] = true
+      else
+        actions["Resume"]["disabled"] = true
       end
 
       return actions
     definitions:
-    - name: Stop
+    - name: Suspend
       action.lua: |
+        local last_replicas = obj.spec.replicas
         obj.spec.replicas = 0
         if obj.metadata.annotations == nil then
-          obj.metadata.annotations = {["skip.kartverket.no/k8sReplicaLimits"] = "ignore"}
+          obj.metadata.annotations = {
+            ["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
+            ["skip.kartverket.no/lastReplicas"] = last_replicas
+          }
         else
           obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = "ignore"
+          obj.metadata.annotations["skip.kartverket.no/lastReplicas"] = last_replicas
+        end
+        return obj
+    - name: Resume
+      action.lua: |
+        local last_replicas = obj.spec.annotations["skip.kartverket.no/lastReplicas"]
+        if last_replicas ~= nil
+          obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
+          obj.spec.replicas = last_replicas
+        else
+          obj.metadata.annotations["skip.kartverket.no/k8sReplicaLimits"] = nil
+          obj.spec.replicas = nil
         end
         return obj
